@@ -6,9 +6,19 @@ import { Repository } from 'typeorm';
 
 @Injectable()
 export class UserAccountService {
-    findAllAccounts() {
+    constructor(
+        @InjectRepository(UserAccount)
+        private accountsRepository: Repository<UserAccount>,
+    ) { }
+
+
+    async findAllAccounts(): Promise<UserAccount[]> {
         console.log('GET ALL ACCOUNTS FIRED!');
-        return 'GET ALL ACCOUNTS FIRED!';
+
+        const users = await this.accountsRepository.find();
+        console.log(users);
+
+        return users;
     }
 
     addAccount(createUserAcountDTO: CreateUserAccountDTO) {

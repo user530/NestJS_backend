@@ -1,13 +1,29 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserProfileDTO, UpdateUserProfileDTO } from './dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { UserProfile } from './user-profile.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class UserProfileService {
-    findProfile(id: number) {
+    constructor(
+        @InjectRepository(UserProfile)
+        private profileRepository: Repository<UserProfile>
+    ) { }
+
+    async findProfile(id: number): Promise<UserProfile> {
         console.log('FIND PROFILE FIRED!');
         console.log('ID - ', id);
 
-        return 'FIND PROFILE FIRED!';
+        const profile = await this.profileRepository.findOne({
+            where: {
+                id
+            }
+        })
+
+        console.log(profile)
+
+        return profile;
     }
 
     addProfile(createUserProfileDTO: CreateUserProfileDTO) {

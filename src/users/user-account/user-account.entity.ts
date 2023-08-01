@@ -2,7 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn, BeforeIns
 import { UserProfile } from '../user-profile/user-profile.entity';
 import { randomBytes, pbkdf2Sync } from 'crypto'
 
-@Entity()
+@Entity({ name: 'user' })
 export class UserAccount {
     @PrimaryGeneratedColumn()
     id: number;
