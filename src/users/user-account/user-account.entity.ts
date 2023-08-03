@@ -1,44 +1,44 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn, BeforeInsert, BeforeUpdate } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn, BeforeInsert, BeforeUpdate, AfterLoad } from 'typeorm';
 import { UserProfile } from '../user-profile/user-profile.entity';
 import { randomBytes, pbkdf2Sync } from 'crypto'
 
-@Entity({ name: 'user' })
+@Entity({ name: 'account' })
 export class UserAccount {
     @PrimaryGeneratedColumn()
-    id: number;
+    public id: number;
+
+    @Column({ unique: true })
+    public email: string
 
     @Column()
-    email: string
+    public password: string
 
     @Column()
-    password: string
-
-    @Column()
-    salt: string
+    public salt: string
 
     @OneToOne(() => UserProfile, (profile) => profile.userAccount, { cascade: true })
     @JoinColumn()
-    userProfile: UserProfile;
+    public userProfile: UserProfile;
 
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-    createdAt: Date;
+    public createdAt: Date;
 
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-    updatedAt: Date;
+    public updatedAt: Date;
 
     @BeforeInsert()
-    generateSaltAndHashPassword() {
+    private generateSaltAndHashPassword(): void {
         this.salt = randomBytes(16).toString('hex');
-        this.password = this.hashPasswordWithSalt(this.password, this.salt)
+        this.password = this.hashPasswordWithSalt(this.password)
     }
 
     @BeforeUpdate()
-    setUpdateDate() {
+    private setUpdateDate(): void {
         this.updatedAt = new Date();
     }
 
-    private hashPasswordWithSalt(password: string, salt: string) {
-        return pbkdf2Sync(password, salt, 1000, 64, 'sha512').toString('hex');
+    public hashPasswordWithSalt(password: string): string {
+        return pbkdf2Sync(password, this.salt, 1000, 64, 'sha512').toString('hex');
     }
 }
 

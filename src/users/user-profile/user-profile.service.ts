@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserProfileDTO, UpdateUserProfileDTO } from './dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserProfile } from './user-profile.entity';
-import { Repository } from 'typeorm';
+import { DeleteResult, Repository } from 'typeorm';
 
 @Injectable()
 export class UserProfileService {
@@ -12,39 +12,54 @@ export class UserProfileService {
     ) { }
 
     async findProfile(id: number): Promise<UserProfile> {
-        console.log('FIND PROFILE FIRED!');
-        console.log('ID - ', id);
 
-        const profile = await this.profileRepository.findOne({
+        const existingProfile: UserProfile = await this.profileRepository.findOne({
+            where: {
+                id
+            }
+        });
+
+        if (!existingProfile)
+            throw new NotFoundException('User Profile not found!');
+
+
+        return existingProfile;
+    }
+
+    async addProfile(createUserProfileDTO: CreateUserProfileDTO): Promise<UserProfile> {
+        const newProfile: UserProfile = this.profileRepository.create(createUserProfileDTO);
+
+        return this.profileRepository.save(newProfile);
+    }
+
+    async updateProfile(id: number, updateUserProfileDTO: UpdateUserProfileDTO): Promise<UserProfile> {
+
+        const existingProfile: UserProfile = await this.profileRepository.findOne({
             where: {
                 id
             }
         })
 
-        console.log(profile)
+        if (!existingProfile)
+            throw new NotFoundException('User Profile not found!')
 
-        return profile;
+        if (updateUserProfileDTO.address)
+            existingProfile.address = updateUserProfileDTO.address;
+
+        if (updateUserProfileDTO.name)
+            existingProfile.name = updateUserProfileDTO.name;
+
+        if (updateUserProfileDTO.phone)
+            existingProfile.phone = updateUserProfileDTO.phone;
+
+        return this.profileRepository.save(existingProfile);
     }
 
-    addProfile(createUserProfileDTO: CreateUserProfileDTO) {
-        console.log('ADD PROFILE FIRED!');
-        console.log(createUserProfileDTO);
+    async deleteProfile(id: number): Promise<void> {
 
-        return 'ADD PROFILE FIRED!';
-    }
+        const result: DeleteResult = await this.profileRepository.delete(id);
 
-    updateProfile(id: number, updateUserProfileDTO: UpdateUserProfileDTO) {
-        console.log('UPDATE PROFILE FIRED!');
-        console.log('ID - ', id);
-        console.log(updateUserProfileDTO);
-
-        return 'UPDATE PROFILE FIRED!';
-    }
-
-    deleteProfile(id: number) {
-        console.log('DELETE PROFILE FIRED!');
-        console.log('ID - ', id);
-
-        return 'DELETE PROFILE FIRED!';
+        if (result.affected === 0)
+            throw new NotFoundException('User Profile not found!');
     }
 }

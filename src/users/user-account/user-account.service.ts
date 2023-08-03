@@ -1,48 +1,90 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException, UseInterceptors } from '@nestjs/common';
 import { CreateUserAccountDTO, UpdateUserAccountDTO } from './dto/';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserAccount } from './user-account.entity';
-import { Repository } from 'typeorm';
+import { DeleteResult, Repository } from 'typeorm';
 
 @Injectable()
 export class UserAccountService {
     constructor(
         @InjectRepository(UserAccount)
-        private accountsRepository: Repository<UserAccount>,
+        private readonly accountsRepository: Repository<UserAccount>
     ) { }
 
 
     async findAllAccounts(): Promise<UserAccount[]> {
-        console.log('GET ALL ACCOUNTS FIRED!');
+        const userAccounts: UserAccount[] = await this.accountsRepository.find({ order: { id: 'ASC' } });
 
-        const users = await this.accountsRepository.find();
-        console.log(users);
 
-        return users;
+
+        return userAccounts;
     }
 
-    addAccount(createUserAcountDTO: CreateUserAccountDTO) {
-        console.log('ADD NEW ACCOUNT FIRED!');
-        console.log(createUserAcountDTO);
-        return 'ADD NEW ACCOUNT FIRED!';
+    async addAccount(createUserAcountDTO: CreateUserAccountDTO): Promise<UserAccount> {
+
+        const existingAccount: UserAccount = await this.accountsRepository.findOne({
+            where: {
+                email: createUserAcountDTO.email
+            }
+        })
+
+        if (existingAccount)
+            throw new ConflictException('This email is already in use!');
+
+        const newAccount: UserAccount = await this.accountsRepository.create(createUserAcountDTO);
+
+        return this.accountsRepository.save(newAccount);
     }
 
-    findOneAccount(id: number) {
-        console.log('GET SINGLE ACCOUNT FIRED!');
-        console.log(id);
-        return 'GET SINGLE ACCOUNT FIRED!';
+    async findOneAccount(id: number): Promise<UserAccount> {
+
+        const existingAccount: UserAccount = await this.accountsRepository.findOne({
+            where: {
+                id
+            }
+        })
+
+        if (!existingAccount)
+            throw new NotFoundException('User Account not found!');
+
+        return existingAccount;
     }
 
-    updateAccount(id: number, updateUserAccountDTO: UpdateUserAccountDTO) {
-        console.log('UPDATE ACCOUNT FIRED!');
-        console.log(id)
-        console.log(updateUserAccountDTO);
-        return 'UPDATE ACCOUNT FIRED!';
+    async updateAccount(id: number, updateUserAccountDTO: UpdateUserAccountDTO) {
+
+        const existingAccount: UserAccount = await this.accountsRepository.findOne({
+            where: {
+                id
+            }
+        });
+
+        if (!existingAccount)
+            throw new NotFoundException('User Account not found!')
+
+        if (updateUserAccountDTO.password)
+            existingAccount.password = existingAccount.hashPasswordWithSalt(updateUserAccountDTO.password);
+
+        if (updateUserAccountDTO.email) {
+            const usedEmail: UserAccount = await this.accountsRepository.findOne({
+                where: {
+                    email: updateUserAccountDTO.email
+                }
+            })
+
+            if (usedEmail && existingAccount.email !== usedEmail.email)
+                throw new ConflictException('This email is already in use!');
+            else
+                existingAccount.email = updateUserAccountDTO.email;
+        }
+
+        return this.accountsRepository.save(existingAccount) as Promise<UserAccount>;
     }
 
-    deleteAccount(id: number) {
-        console.log('DELETE ACCOUNT FIRED!');
-        console.log(id);
-        return 'DELETE ACCOUNT FIRED!'
+    async deleteAccount(id: number): Promise<void> {
+
+        const result: DeleteResult = await this.accountsRepository.delete(id);
+
+        if (result.affected === 0)
+            throw new NotFoundException('User Account not found!');
     }
 }
