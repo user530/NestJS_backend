@@ -1,63 +1,107 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserProfileDTO, UpdateUserProfileDTO } from './dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserProfile } from './user-profile.entity';
 import { DeleteResult, Repository } from 'typeorm';
+import { UserAccount } from '../user-account/user-account.entity';
 
 @Injectable()
 export class UserProfileService {
     constructor(
+        @InjectRepository(UserAccount)
+        private accountRepository: Repository<UserAccount>,
         @InjectRepository(UserProfile)
         private profileRepository: Repository<UserProfile>
     ) { }
 
     async findProfile(id: number): Promise<UserProfile> {
 
-        const existingProfile: UserProfile = await this.profileRepository.findOne({
+        const existingAccount: UserAccount = await this.accountRepository.findOne({
             where: {
                 id
-            }
-        });
+            },
+            relations: ['profile']
+        })
 
-        if (!existingProfile)
-            throw new NotFoundException('User Profile not found!');
+        if (!existingAccount)
+            throw new NotFoundException('User Account not found!');
 
+        if (!existingAccount.profile)
+            throw new NotFoundException('No Profile associated with this account!');
 
-        return existingProfile;
+        return existingAccount.profile;
     }
 
-    async addProfile(createUserProfileDTO: CreateUserProfileDTO): Promise<UserProfile> {
-        const newProfile: UserProfile = this.profileRepository.create(createUserProfileDTO);
+    async addProfile(id: number, createUserProfileDTO: CreateUserProfileDTO): Promise<UserProfile> {
+
+        const existingAccount: UserAccount = await this.accountRepository.findOne({
+            where: {
+                id
+            },
+            relations: ['profile']
+        });
+
+        if (!existingAccount)
+            throw new NotFoundException('User Account not found!');
+
+        if (existingAccount.profile)
+            throw new ConflictException('User already has profile!');
+
+        const newProfile: UserProfile = this.profileRepository.create({
+            ...createUserProfileDTO,
+            account: existingAccount
+        });
 
         return this.profileRepository.save(newProfile);
     }
 
     async updateProfile(id: number, updateUserProfileDTO: UpdateUserProfileDTO): Promise<UserProfile> {
 
-        const existingProfile: UserProfile = await this.profileRepository.findOne({
+        const existingAccount: UserAccount = await this.accountRepository.findOne({
             where: {
                 id
-            }
-        })
+            },
+            relations: ['profile']
+        });
 
-        if (!existingProfile)
-            throw new NotFoundException('User Profile not found!')
+        if (!existingAccount)
+            throw new NotFoundException('User Account not found!');
 
-        if (updateUserProfileDTO.address)
-            existingProfile.address = updateUserProfileDTO.address;
+        if (!existingAccount.profile)
+            throw new NotFoundException('User Profile not found!');
 
         if (updateUserProfileDTO.name)
-            existingProfile.name = updateUserProfileDTO.name;
+            existingAccount.profile.name = updateUserProfileDTO.name;
 
         if (updateUserProfileDTO.phone)
-            existingProfile.phone = updateUserProfileDTO.phone;
+            existingAccount.profile.phone = updateUserProfileDTO.phone;
 
-        return this.profileRepository.save(existingProfile);
+        if (updateUserProfileDTO.address)
+            existingAccount.profile.address = updateUserProfileDTO.address;
+
+        return this.profileRepository.save(existingAccount.profile);
     }
 
     async deleteProfile(id: number): Promise<void> {
 
-        const result: DeleteResult = await this.profileRepository.delete(id);
+        const existingAccount: UserAccount = await this.accountRepository.findOne({
+            where: {
+                id
+            },
+            relations: ['profile']
+        });
+
+        if (!existingAccount)
+            throw new NotFoundException('User Account not found!');
+
+        if (!existingAccount.profile)
+            throw new NotFoundException('User Profile not found!');
+
+        const profileId = existingAccount.profile.id;
+        existingAccount.profile = null;
+        await this.accountRepository.save(existingAccount)
+
+        const result: DeleteResult = await this.profileRepository.delete(profileId);
 
         if (result.affected === 0)
             throw new NotFoundException('User Profile not found!');

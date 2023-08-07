@@ -15,8 +15,8 @@ export class UserProfile {
     @Column()
     phone: string;
 
-    @OneToOne(() => UserAccount, account => account.userProfile)
-    userAccount: UserAccount
+    @OneToOne(() => UserAccount, account => account.profile)
+    account: UserAccount
 
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     createdAt: Date;

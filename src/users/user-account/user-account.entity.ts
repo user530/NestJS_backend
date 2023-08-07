@@ -16,9 +16,9 @@ export class UserAccount {
     @Column()
     public salt: string
 
-    @OneToOne(() => UserProfile, (profile) => profile.userAccount, { cascade: true })
+    @OneToOne(() => UserProfile, (profile) => profile.account, { eager: true, cascade: true })
     @JoinColumn()
-    public userProfile: UserProfile;
+    public profile: UserProfile;
 
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     public createdAt: Date;

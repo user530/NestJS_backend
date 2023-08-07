@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsPhoneNumber } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsPhoneNumber } from 'class-validator';
 
 export class CreateUserProfileDTO {
     @IsNotEmpty()
