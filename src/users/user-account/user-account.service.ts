@@ -15,8 +15,6 @@ export class UserAccountService {
     async findAllAccounts(): Promise<UserAccount[]> {
         const userAccounts: UserAccount[] = await this.accountsRepository.find({ order: { id: 'ASC' } });
 
-
-
         return userAccounts;
     }
 
@@ -48,6 +46,20 @@ export class UserAccountService {
             throw new NotFoundException('User Account not found!');
 
         return existingAccount;
+    }
+
+    async findAccountByEmail(email: string) {
+
+        const existingAccount: UserAccount = await this.accountsRepository.findOne({
+            where: {
+                email
+            }
+        });
+
+        if (!existingAccount)
+            throw new NotFoundException('User Account not found!');
+
+        return existingAccount
     }
 
     async updateAccount(id: number, updateUserAccountDTO: UpdateUserAccountDTO) {
@@ -86,5 +98,9 @@ export class UserAccountService {
 
         if (result.affected === 0)
             throw new NotFoundException('User Account not found!');
+    }
+
+    checkAccountPassword(account: UserAccount, password: string) {
+        return account.hashPasswordWithSalt(password) === account.password
     }
 }
