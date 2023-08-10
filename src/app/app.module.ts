@@ -2,10 +2,10 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from 'src/users/users.module';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { TypeOrmModule, TypeOrmModuleAsyncOptions } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import databaseConfig from 'config/database.config';
-import jwtConfig from 'config/database.config';
+import jwtConfig from 'config/jwt.config';
 import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
@@ -16,7 +16,7 @@ import { AuthModule } from 'src/auth/auth.module';
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => configService.get('database'),
+      useFactory: (configService: ConfigService) => configService.get<TypeOrmModuleAsyncOptions>('database'),
       inject: [ConfigService]
     }),
     UsersModule,

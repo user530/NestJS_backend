@@ -14,10 +14,7 @@ export class AuthService {
 
     public async validateLoginDTO(loginDTO: AuthLoginDTO): Promise<UserAccount> {
         try {
-            console.log(1)
             const userAccount: UserAccount = await this.userAccountService.findAccountByEmail(loginDTO.email);
-
-            console.log(2)
 
             if (!userAccount)
                 throw new UnauthorizedException('Invalid credentials!');
@@ -37,8 +34,7 @@ export class AuthService {
     public generateAccessToken(userAccount: UserAccount): string {
         return this.jwtService.sign(
             {
-                sub: userAccount.id,
-                exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24
+                sub: userAccount.id
             });
     }
 
@@ -47,7 +43,6 @@ export class AuthService {
             {
                 sub: userAccount.id,
                 type: 'refreshToken',
-                exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 30
             },
             { expiresIn: '30d' }
         )
