@@ -12,14 +12,9 @@ export class AuthenticatedUserGuard implements CanActivate {
   ): Promise<boolean> {
 
     try {
-
-      console.log('Authenticated guard - Fired');
-
       const request: ExtendedRequest = context.switchToHttp().getRequest();
 
       const authHeader: string = request.headers.authorization;
-
-      console.log('Authenticated guard - Auth header ', authHeader);
 
       if (!authHeader || !authHeader.startsWith('Bearer '))
         throw new Error;
@@ -30,13 +25,10 @@ export class AuthenticatedUserGuard implements CanActivate {
 
       request.user = { id: user.id, email: user.email };
 
-      console.log('Authenticated guard - success');
-      console.log(user);
-
       return true;
 
     } catch (error) {
-      console.log('Authenticated guard - failed');
+
       return false;
     }
   }

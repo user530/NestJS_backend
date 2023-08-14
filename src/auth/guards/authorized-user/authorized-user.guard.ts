@@ -10,27 +10,18 @@ export class AuthorizedUserGuard implements CanActivate {
 
     try {
 
-      console.log('Authorized guard - Fired')
-
       const request: ExtendedRequest = context.switchToHttp().getRequest();
 
       const { id } = request.user;
 
-      console.log('Authorized guard - ID ', id)
-
       const requestParamId: string = request.params.id;
-
-      console.log('Authorized guard - param ID ', requestParamId)
 
       if (!requestParamId || requestParamId !== id.toString())
         throw new UnauthorizedException();
 
-      console.log('Authorized guard - success');
-      console.log(`Id is ${id}, request param is ${requestParamId}`);
-
       return true;
     } catch (error) {
-      console.log('Authorized guard - failed');
+
       return false;
     }
   }
