@@ -1,3 +1,4 @@
+import { Request } from 'express'
 
 export interface AccessTokenPayload {
     sub: string,
@@ -6,4 +7,11 @@ export interface AccessTokenPayload {
 
 export interface RefreshTokenPayload extends AccessTokenPayload {
     type: 'refreshToken'
+}
+
+export interface ExtendedRequest extends Request {
+    user: {
+        id: number;
+        email: string;
+    }
 }

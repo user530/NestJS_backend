@@ -1,9 +1,10 @@
-import { Injectable, ParseIntPipe, UnauthorizedException } from '@nestjs/common';
-import { AuthLoginDTO } from './dto/auth-login.dto';
-import { UserAccountService } from 'src/users/user-account/user-account.service';
-import { UserAccount } from 'src/users/user-account/user-account.entity';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { UserAccountService } from 'src/shared-db/services';
+import { AuthLoginDTO } from './dto';
+import { UserAccount } from 'src/shared-db/entities';
 import { AccessTokenPayload, RefreshTokenPayload } from './auth.interface';
+
 
 @Injectable()
 export class AuthService {
@@ -78,7 +79,7 @@ export class AuthService {
             return user;
 
         } catch (error) {
-            throw new UnauthorizedException('Invalid refresh token!');
+            throw new UnauthorizedException('Invalid token!');
         }
     }
 }

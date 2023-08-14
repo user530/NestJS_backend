@@ -7,6 +7,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import databaseConfig from 'config/database.config';
 import jwtConfig from 'config/jwt.config';
 import { AuthModule } from 'src/auth/auth.module';
+import { SharedDbModule } from 'src/shared-db/shared-db.module';
+import { UserApiModule } from 'src/user-api/user-api.module';
 
 @Module({
   imports: [
@@ -19,8 +21,9 @@ import { AuthModule } from 'src/auth/auth.module';
       useFactory: (configService: ConfigService) => configService.get<TypeOrmModuleAsyncOptions>('database'),
       inject: [ConfigService]
     }),
-    UsersModule,
-    AuthModule
+    SharedDbModule,
+    AuthModule,
+    UserApiModule
   ],
   controllers: [AppController],
   providers: [AppService],
