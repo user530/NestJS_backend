@@ -9,7 +9,6 @@ export class AuthorizedUserGuard implements CanActivate {
   ): boolean | Promise<boolean> | Observable<boolean> {
 
     try {
-
       const request: ExtendedRequest = context.switchToHttp().getRequest();
 
       const { id } = request.user;
@@ -21,8 +20,7 @@ export class AuthorizedUserGuard implements CanActivate {
 
       return true;
     } catch (error) {
-
-      return false;
+      throw new UnauthorizedException()
     }
   }
 }

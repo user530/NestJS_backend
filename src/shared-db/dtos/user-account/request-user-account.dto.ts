@@ -1,5 +1,6 @@
-import { Expose } from 'class-transformer';
-import { IsDateString, IsEmail, IsNotEmpty } from 'class-validator';
+import { Expose, Type } from 'class-transformer';
+import { IsDateString, IsEmail, IsNotEmpty, IsOptional } from 'class-validator';
+import { RequestUserProfileDTO } from '../user-profile';
 
 export class RequestUserAccountDTO {
     @Expose()
@@ -10,6 +11,11 @@ export class RequestUserAccountDTO {
     @IsNotEmpty()
     @IsEmail()
     email: string;
+
+    @Expose()
+    @IsOptional()
+    @Type(() => RequestUserProfileDTO)
+    profile: RequestUserProfileDTO;
 
     @Expose({ name: 'createdAt' })
     @IsNotEmpty()

@@ -1,4 +1,4 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ExtendedRequest } from 'src/auth/auth.interface';
 import { AuthService } from 'src/auth/auth.service';
 import { UserAccount } from 'src/shared-db/entities';
@@ -10,26 +10,21 @@ export class AuthenticatedUserGuard implements CanActivate {
   async canActivate(
     context: ExecutionContext,
   ): Promise<boolean> {
-
     try {
       const request: ExtendedRequest = context.switchToHttp().getRequest();
 
-      const authHeader: string = request.headers.authorization;
+      const token: string = request.cookies['access_token'];
 
-      if (!authHeader || !authHeader.startsWith('Bearer '))
+      if (!token)
         throw new Error;
-
-      const token: string = authHeader.split(' ')[1];
 
       const user: UserAccount = await this.authService.verifyToken(token);
 
       request.user = { id: user.id, email: user.email };
 
       return true;
-
     } catch (error) {
-
-      return false;
+      throw new UnauthorizedException()
     }
   }
 }

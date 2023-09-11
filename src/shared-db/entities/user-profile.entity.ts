@@ -15,7 +15,7 @@ export class UserProfile {
     @Column()
     phone: string;
 
-    @OneToOne(() => UserAccount, account => account.profile)
+    @OneToOne(() => UserAccount, account => account.profile, { onDelete: 'CASCADE' })
     account: UserAccount
 
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })

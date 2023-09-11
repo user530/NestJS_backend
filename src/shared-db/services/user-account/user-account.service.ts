@@ -94,10 +94,18 @@ export class UserAccountService {
 
     async deleteAccount(id: number): Promise<void> {
 
-        const result: DeleteResult = await this.accountsRepository.delete(id);
+        const user: UserAccount = await this.accountsRepository.findOne({
+            where: {
+                id
+            }
+        });
 
-        if (result.affected === 0)
+        if (!user)
             throw new NotFoundException('User Account not found!');
+
+
+
+        const del = await this.accountsRepository.remove(user);
     }
 
     checkAccountPassword(account: UserAccount, password: string) {

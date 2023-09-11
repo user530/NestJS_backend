@@ -16,7 +16,7 @@ export class UserAccount {
     @Column()
     public salt: string
 
-    @OneToOne(() => UserProfile, (profile) => profile.account, { eager: true, cascade: true })
+    @OneToOne(() => UserProfile, (profile) => profile.account, { eager: true, cascade: ['remove'] })
     @JoinColumn()
     public profile: UserProfile;
 
