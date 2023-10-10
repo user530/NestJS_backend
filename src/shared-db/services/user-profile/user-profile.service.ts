@@ -48,7 +48,7 @@ export class UserProfileService {
 
         const newProfile: UserProfile = this.profileRepository.create({
             ...createUserProfileDTO,
-            account: existingAccount
+            account: existingAccount,
         });
 
         return this.profileRepository.save(newProfile);

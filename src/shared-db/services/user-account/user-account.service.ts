@@ -103,9 +103,7 @@ export class UserAccountService {
         if (!user)
             throw new NotFoundException('User Account not found!');
 
-
-
-        const del = await this.accountsRepository.remove(user);
+        await this.accountsRepository.remove(user);
     }
 
     checkAccountPassword(account: UserAccount, password: string) {

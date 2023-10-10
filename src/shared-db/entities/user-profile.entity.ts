@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne, BeforeInsert } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToOne, BeforeInsert, JoinColumn } from 'typeorm';
 import { UserAccount } from './user-account.entity'
 
 @Entity({ name: 'profile' })
@@ -16,6 +16,7 @@ export class UserProfile {
     phone: string;
 
     @OneToOne(() => UserAccount, account => account.profile, { onDelete: 'CASCADE' })
+    @JoinColumn()
     account: UserAccount
 
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })

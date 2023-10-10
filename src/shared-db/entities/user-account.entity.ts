@@ -16,8 +16,7 @@ export class UserAccount {
     @Column()
     public salt: string
 
-    @OneToOne(() => UserProfile, (profile) => profile.account, { eager: true, cascade: ['remove'] })
-    @JoinColumn()
+    @OneToOne(() => UserProfile, (profile) => profile.account, { eager: true })
     public profile: UserProfile;
 
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })

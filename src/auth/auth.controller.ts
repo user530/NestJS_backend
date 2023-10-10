@@ -33,13 +33,10 @@ export class AuthController {
 
     @Post('logout')
     @HttpCode(200)
-    @UseGuards(AuthenticatedUserGuard)
     @Redirect('/')
     logout(@Res() response: Response) {
         response.clearCookie('access_token');
         response.clearCookie('refresh_token');
-
-        return response.json({ message: 'Logout successful.' })
     }
 
     @Post('refresh')
