@@ -1,7 +1,7 @@
 import { registerAs } from '@nestjs/config';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { UserAccount, UserProfile } from 'src/shared-db/entities';
-// import { CreateUserAccount, CreateUserProfile } from 'src/migrations'
+import { CreateUserAccount, CreateUserProfile } from 'src/migrations'
 
 export default registerAs('database', (): TypeOrmModuleOptions => {
     const type = isDbType(process.env.DB_TYPE) ? process.env.DB_TYPE : 'mysql';
@@ -15,8 +15,8 @@ export default registerAs('database', (): TypeOrmModuleOptions => {
         database: process.env.DB_NAME || 'my_database',
         synchronize: process.env.DB_SYNC === 'true',
         entities: [UserAccount, UserProfile],
-        // migrations: [CreateUserAccount, CreateUserProfile],
-        // migrationsRun: true,
+        migrations: [CreateUserAccount, CreateUserProfile],
+        migrationsRun: true,
     }
 })
 

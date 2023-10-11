@@ -96,11 +96,7 @@ export class UserProfileService {
         if (!existingAccount.profile)
             throw new NotFoundException('User Profile not found!');
 
-        const profileId = existingAccount.profile.id;
-        existingAccount.profile = null;
-        await this.accountRepository.save(existingAccount)
-
-        const result: DeleteResult = await this.profileRepository.delete(profileId);
+        const result: DeleteResult = await this.profileRepository.delete(existingAccount.profile.id);
 
         if (result.affected === 0)
             throw new NotFoundException('User Profile not found!');

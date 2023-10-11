@@ -1,7 +1,7 @@
-// import { CreateUserAccountTable1696758179738 as CreateUserAccount } from '';
-// import { CreateUserProfileTable1696758198343 as CreateUserProfile } from '';
+import { CreateUserAccount1696928130312 as CreateUserAccount } from './1696928130312-createUserAccount';
+import { CreateUserProfile1696928136715 as CreateUserProfile } from './1696928136715-createUserProfile';
 
-// export {
-//     CreateUserAccount,
-//     CreateUserProfile
-// }
+export {
+    CreateUserAccount,
+    CreateUserProfile
+}
