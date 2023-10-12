@@ -24,7 +24,6 @@ export class UserAccountController {
     @Get(':id')
     @UseGuards(AuthenticatedUserGuard, AuthorizedUserGuard)
     getSingleAccount(@Param('id', ParseIntPipe) id: number) {
-
         return this.userAccountService.findOneAccount(id);
     }
 

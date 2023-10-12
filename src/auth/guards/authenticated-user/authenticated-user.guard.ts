@@ -1,6 +1,8 @@
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
+import { plainToClass } from 'class-transformer';
 import { ExtendedRequest } from 'src/auth/auth.interface';
 import { AuthService } from 'src/auth/auth.service';
+import { MinRequestUserAccountDTO } from 'src/shared-db/dtos/user-account';
 import { UserAccount } from 'src/shared-db/entities';
 
 @Injectable()
@@ -20,7 +22,7 @@ export class AuthenticatedUserGuard implements CanActivate {
 
       const user: UserAccount = await this.authService.verifyToken(token);
 
-      request.user = { id: user.id, email: user.email };
+      request.user = plainToClass(MinRequestUserAccountDTO, user, { excludeExtraneousValues: true });
 
       return true;
     } catch (error) {

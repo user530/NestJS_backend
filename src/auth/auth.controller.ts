@@ -1,11 +1,12 @@
-import { Body, Controller, HttpCode, Post, Redirect, Req, Res, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, Post, Req, Res, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthLoginDTO } from './dto';
 import { UserAccount } from 'src/shared-db/entities';
 import { Request, Response } from 'express';
-import { AuthenticatedUserGuard } from './guards';
 import { plainToClass } from 'class-transformer';
-import { RequestUserAccountDTO } from 'src/shared-db/dtos';
+import { ExtendedRequest } from './auth.interface';
+import { AuthenticatedUserGuard } from './guards';
+import { MinRequestUserAccountDTO } from 'src/shared-db/dtos/user-account';
 
 
 @Controller('auth')
@@ -14,7 +15,7 @@ export class AuthController {
 
     @Post('login')
     @HttpCode(200)
-    async signIn(@Body() authLoginDto: AuthLoginDTO, @Res() response: Response) {
+    async signIn(@Body() authLoginDto: AuthLoginDTO, @Res() response: Response): Promise<Response<MinRequestUserAccountDTO>> {
         try {
             const userAccount: UserAccount = await this.authService.validateLoginDTO(authLoginDto);
 
@@ -24,22 +25,23 @@ export class AuthController {
             response.cookie('access_token', accessToken, { httpOnly: true, sameSite: 'strict', maxAge: 1000 * 60 * 60 });
             response.cookie('refresh_token', refreshToken, { httpOnly: true, sameSite: 'strict', maxAge: 1000 * 60 * 60 * 24 * 30 });
 
-            return response.json(plainToClass(RequestUserAccountDTO, userAccount, { excludeExtraneousValues: true }));
+            return response.json(plainToClass(MinRequestUserAccountDTO, userAccount, { excludeExtraneousValues: true }));
         }
         catch {
             throw new UnauthorizedException('Invalid login credentials!');
         }
     }
 
-    @Post('logout')
+    @Delete('logout')
     @HttpCode(200)
-    @Redirect('/')
     logout(@Res() response: Response) {
         response.clearCookie('access_token');
         response.clearCookie('refresh_token');
+
+        return response.json({ message: 'Logged out' });
     }
 
-    @Post('refresh')
+    @Get('refresh')
     @HttpCode(200)
     async refresh(@Req() request: Request, @Res() response: Response) {
         try {
@@ -53,9 +55,18 @@ export class AuthController {
             response.cookie('access_token', newAccessToken, { httpOnly: true, sameSite: 'strict', maxAge: 1000 * 60 * 60 })
             response.cookie('refresh_token', newRefreshToken, { httpOnly: true, sameSite: 'strict', maxAge: 1000 * 60 * 60 * 24 * 30 })
 
-            response.json({ message: 'Token refreshed successfully!' });
+            return response.json({ message: 'Token refreshed successfully!' });
         } catch (error) {
             throw new UnauthorizedException('Invalid refresh token!');
         }
     }
+
+    @Get('getme')
+    @UseGuards(AuthenticatedUserGuard)
+    @HttpCode(200)
+    async getMe(@Req() request: ExtendedRequest): Promise<MinRequestUserAccountDTO> {
+
+        return request.user;
+    }
+
 }

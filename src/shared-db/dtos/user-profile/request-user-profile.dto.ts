@@ -32,3 +32,18 @@ export class RequestUserProfileDTO {
     @IsDateString()
     updated_at: Date;
 }
+
+export class MinRequestUserProfileDTO {
+    @Expose()
+    @IsOptional()
+    name: string
+
+    @Expose()
+    @IsOptional()
+    address: string
+
+    @Expose()
+    @IsOptional()
+    @IsPhoneNumber()
+    phone: string;
+}

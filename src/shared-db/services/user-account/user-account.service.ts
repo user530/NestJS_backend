@@ -2,7 +2,7 @@ import { ConflictException, Injectable, NotFoundException } from '@nestjs/common
 import { CreateUserAccountDTO, UpdateUserAccountDTO } from '../../dtos';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserAccount } from '../../entities';
-import { DeleteResult, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class UserAccountService {

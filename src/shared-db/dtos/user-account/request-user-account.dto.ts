@@ -1,6 +1,6 @@
 import { Expose, Type } from 'class-transformer';
 import { IsDateString, IsEmail, IsNotEmpty, IsOptional } from 'class-validator';
-import { RequestUserProfileDTO } from '../user-profile';
+import { MinRequestUserProfileDTO, RequestUserProfileDTO } from '../user-profile';
 
 export class RequestUserAccountDTO {
     @Expose()
@@ -26,4 +26,20 @@ export class RequestUserAccountDTO {
     @IsNotEmpty()
     @IsDateString()
     updated_at: Date;
+}
+
+export class MinRequestUserAccountDTO {
+    @Expose()
+    @IsNotEmpty()
+    id: number;
+
+    @Expose()
+    @IsNotEmpty()
+    @IsEmail()
+    email: string;
+
+    @Expose()
+    @IsOptional()
+    @Type(() => MinRequestUserProfileDTO)
+    profile: RequestUserProfileDTO;
 }

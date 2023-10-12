@@ -35,7 +35,8 @@ export class AuthService {
     public generateAccessToken(userAccount: UserAccount): string {
         return this.jwtService.sign(
             {
-                sub: userAccount.id
+                sub: userAccount.id,
+                created_at: userAccount.createdAt,
             });
     }
 
@@ -43,27 +44,11 @@ export class AuthService {
         return this.jwtService.sign(
             {
                 sub: userAccount.id,
+                created_at: userAccount.createdAt,
                 type: 'refreshToken',
             },
             { expiresIn: '30d' }
         )
-    }
-
-    public async refreshAccessToken(refreshToken: string): Promise<string> {
-        try {
-            const payload: RefreshTokenPayload = this.jwtService.verify(refreshToken);
-
-            const user: UserAccount = await this.userAccountService.findOneAccount(parseInt(payload.sub, 10));
-
-            if (!user)
-                throw new Error
-
-            return this.generateAccessToken(user);
-
-        } catch (error) {
-            throw new UnauthorizedException('Invalid refresh token!');
-        }
-
     }
 
     public async verifyToken(token: string): Promise<UserAccount> {
@@ -73,7 +58,7 @@ export class AuthService {
 
             const user: UserAccount = await this.userAccountService.findOneAccount(parseInt(payload.sub, 10));
 
-            if (!user)
+            if (!user || payload.created_at !== user.createdAt.toISOString())
                 throw new Error
 
             return user;
