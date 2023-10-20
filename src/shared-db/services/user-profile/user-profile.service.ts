@@ -55,7 +55,6 @@ export class UserProfileService {
     }
 
     async updateProfile(id: number, updateUserProfileDTO: UpdateUserProfileDTO): Promise<UserProfile> {
-
         const existingAccount: UserAccount = await this.accountRepository.findOne({
             where: {
                 id
@@ -69,14 +68,10 @@ export class UserProfileService {
         if (!existingAccount.profile)
             throw new NotFoundException('User Profile not found!');
 
-        if (updateUserProfileDTO.name)
-            existingAccount.profile.name = updateUserProfileDTO.name;
-
-        if (updateUserProfileDTO.phone)
-            existingAccount.profile.phone = updateUserProfileDTO.phone;
-
-        if (updateUserProfileDTO.address)
-            existingAccount.profile.address = updateUserProfileDTO.address;
+        existingAccount.profile.name = updateUserProfileDTO.name;
+        existingAccount.profile.phone = updateUserProfileDTO.phone;
+        existingAccount.profile.address = updateUserProfileDTO.address;
+        existingAccount.profile.about = updateUserProfileDTO.about;
 
         return this.profileRepository.save(existingAccount.profile);
     }

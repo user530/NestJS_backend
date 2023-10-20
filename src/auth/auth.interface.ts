@@ -1,7 +1,5 @@
 import { Request } from 'express'
-import { RequestUserProfileDTO } from 'src/shared-db/dtos';
-import { MinRequestUserAccountDTO } from 'src/shared-db/dtos/user-account';
-import { UserProfile } from 'src/shared-db/entities';
+import { MinRequestUserAccountDTO } from 'src/shared-db/dtos';
 
 export interface AccessTokenPayload {
     sub: string,

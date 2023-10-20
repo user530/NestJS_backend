@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsPhoneNumber } from 'class-validator';
+import { IsNotEmpty, IsPhoneNumber } from 'class-validator';
 
 export class CreateUserProfileDTO {
     @IsNotEmpty()
@@ -10,4 +10,7 @@ export class CreateUserProfileDTO {
     @IsNotEmpty()
     @IsPhoneNumber('RU')
     phone: string;
+
+    @IsNotEmpty()
+    about: string;
 }

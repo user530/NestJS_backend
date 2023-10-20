@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Expose } from 'class-transformer';
-import { IsDateString, IsNotEmpty, IsOptional, IsPhoneNumber } from 'class-validator';
+import { IsDateString, IsNotEmpty, IsPhoneNumber } from 'class-validator';
 
 
 @Injectable()
@@ -10,17 +10,21 @@ export class RequestUserProfileDTO {
     id: number
 
     @Expose()
-    @IsOptional()
+    @IsNotEmpty()
     name: string
 
     @Expose()
-    @IsOptional()
+    @IsNotEmpty()
     address: string
 
     @Expose()
-    @IsOptional()
+    @IsNotEmpty()
     @IsPhoneNumber()
     phone: string;
+
+    @Expose()
+    @IsNotEmpty()
+    about: string;
 
     @Expose({ name: 'createdAt' })
     @IsNotEmpty()
@@ -35,15 +39,19 @@ export class RequestUserProfileDTO {
 
 export class MinRequestUserProfileDTO {
     @Expose()
-    @IsOptional()
+    @IsNotEmpty()
     name: string
 
     @Expose()
-    @IsOptional()
+    @IsNotEmpty()
     address: string
 
     @Expose()
-    @IsOptional()
+    @IsNotEmpty()
     @IsPhoneNumber()
     phone: string;
+
+    @Expose()
+    @IsNotEmpty()
+    about: string;
 }

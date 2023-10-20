@@ -15,6 +15,9 @@ export class UserProfile {
     @Column()
     phone: string;
 
+    @Column()
+    about: string;
+
     @OneToOne(() => UserAccount, account => account.profile, { onDelete: 'CASCADE' })
     @JoinColumn()
     account: UserAccount

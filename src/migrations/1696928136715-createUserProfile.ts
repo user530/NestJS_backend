@@ -27,6 +27,10 @@ export class CreateUserProfile1696928136715 implements MigrationInterface {
                         type: 'varchar',
                     },
                     {
+                        name: 'about',
+                        type: 'varchar',
+                    },
+                    {
                         name: 'createdAt',
                         type: 'timestamp',
                         default: 'CURRENT_TIMESTAMP',

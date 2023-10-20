@@ -4,12 +4,15 @@ import { IsNotEmpty, IsPhoneNumber } from 'class-validator';
 
 export class UpdateUserProfileDTO extends PartialType(CreateUserProfileDTO) {
     @IsNotEmpty()
-    name?: string;
+    name: string;
 
     @IsNotEmpty()
-    address?: string;
+    address: string;
 
     @IsNotEmpty()
     @IsPhoneNumber('RU')
-    phone?: string;
+    phone: string;
+
+    @IsNotEmpty()
+    about: string;
 }
