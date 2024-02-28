@@ -5,7 +5,7 @@ import { CreateUserAccount, CreateUserProfile } from 'src/migrations'
 
 export default registerAs('database', (): TypeOrmModuleOptions => {
     const type = isDbType(process.env.DB_TYPE) ? process.env.DB_TYPE : 'mysql';
-    console.log(process.env)
+    
     return {
         type,
         host: process.env.DB_HOST || 'localhost',
